@@ -28,9 +28,18 @@ The datasets used for evaluation in the paper are available for download here:
 
 ### Citation
 
-If you use this code in your own work, please cite the following paper:
+If you use this code in your own work, please cite the following pre-print (or the peer reviewed paper, once available):
 
--- Citation to be added --
+Heinrichs, F. (2025). A Note on Local Linear Regression for Time Series in Banach Spaces. *arXiv preprint arXiv:2503.15039*.
+
+    @article{heinrichs2025locallinearregression,
+      title={A Note on Local Linear Regression for Time Series in Banach Spaces},
+      author={Heinrichs, Florian},
+      journal={arXiv preprint arXiv:2503.15039},
+      year={2025}
+    }
+
+    
 
 ### License
 
