@@ -62,7 +62,10 @@ ESTIMATORS = {'NWE': nadaraya_watson_estimator,
               'Filter': frequency_filter}
 
 
-def experiment(folder: str = None, filepath: str = None) -> dict:
+def experiment(folder: str = None,
+               filepath: str = None,
+               estimators: dict = None,
+               single_est: Callable = None) -> dict:
     """
     Compare MAE and MSE of the three estimators (NWE, LLE, Jackknife) with that
     of a frequency filter.
@@ -70,11 +73,21 @@ def experiment(folder: str = None, filepath: str = None) -> dict:
     :param folder: Folder to EEG data (if locally available).
     :param filepath: Path to save the results. Defaults to None, in which case
         no results are saved.
+    :param estimators: Dictionary containing estimators to use. If None,
+        defaults to the global variable ESTIMATORS.
+    :param single_est: Function called for each estimator. Defaults to
+        single_estimator.
     :return: Results of experiments as nested dictionary, with levels:
         1. Recording with keys 'Pxxx_yy'
         2. Estimator: ['NWE', 'LLE', 'Jackknife', 'Filter']
         3. Metrics: ['time', 'MAE', 'MSE']
     """
+    if estimators is None:
+        estimators = ESTIMATORS
+
+    if single_est is None:
+        single_est = single_estimator
+
     task = "level-2-smooth"
     eeg_columns = ['EEG_TP9', 'EEG_AF7', 'EEG_AF8', 'EEG_TP10']
     exclude = ["P002_01", "P004_01"] + [
@@ -94,8 +107,8 @@ def experiment(folder: str = None, filepath: str = None) -> dict:
         X = np.squeeze(X, axis=-1)
         y = rec[['Stimulus_x', 'Stimulus_y']].to_numpy()[:-50:5]
 
-        for estimator_name, estimator in ESTIMATORS.items():
-            res = single_estimator(X, y, estimator, estimator_name)
+        for estimator_name, estimator in estimators.items():
+            res = single_est(X, y, estimator, estimator_name)
             results[i][estimator_name] = res
 
             if filepath is not None:

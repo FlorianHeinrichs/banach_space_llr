@@ -31,6 +31,8 @@ def get_kernel(bw: int, mode: str = 'quartic') -> (np.ndarray, np.ndarray):
         kernel = 35 / 32 * (1 - support ** 2) ** 3
     elif mode == 'tricube':
         kernel = 70 / 81 * (1 - np.abs(support) ** 3) ** 3
+    elif mode == 'triangular':
+        kernel = (1 - np.abs(support))
     else:
         raise ValueError(f"{mode=} unknown.")
 
@@ -73,7 +75,8 @@ def bandwidth_cv(X: np.ndarray,
                  estimator: Callable,
                  num_folds: int = 5,
                  step_size: int = 1,
-                 batch_axis: int = -1) -> np.ndarray:
+                 batch_axis: int = -1,
+                 return_mses: bool = False) -> np.ndarray | tuple:
     """
     Function to tune the bandwidth of kernel estimators.
 
@@ -89,6 +92,7 @@ def bandwidth_cv(X: np.ndarray,
         bandwidth, that is optimal across all points in space, is returned. If
         batch_axis is provided, the bandwidth is tuned for each entry along this
         axis separately.
+    :param return_mses: Indicates whether MSEs are returned too.
     :return: Returns the optimal bandwidth as int.
     """
     indices_shuffle = np.arange(X.shape[0] // num_folds * num_folds)
@@ -100,6 +104,7 @@ def bandwidth_cv(X: np.ndarray,
     n_samples = 1 if batch_axis == -1 else X.shape[batch_axis]
 
     best_bw, best_mse = - np.ones(n_samples, dtype=int), - np.ones(n_samples)
+    mses = []
 
     for bw in range(min_bw, max_bw + 1, step_size):
         mse = np.zeros(n_samples)
@@ -112,8 +117,10 @@ def bandwidth_cv(X: np.ndarray,
                 axis=non_batch_axes
             )
 
+        mses.append(mse)
+
         better_bw = np.where((mse < best_mse) | (best_mse == -1)
                              | np.isnan(best_mse))
         best_bw[better_bw], best_mse[better_bw] = bw, mse[better_bw]
 
-    return best_bw
+    return best_bw, mses if return_mses else best_bw

@@ -39,7 +39,7 @@ def load_data(folder: str,
     """
 
     if src == 'WalkByShop1front' and None in [start, end]:
-        start, end = 0, 2360
+        start, end = 0, 2359
     elif src == 'LeftBag_AtChair':
         start, end = 254, 744
     else:

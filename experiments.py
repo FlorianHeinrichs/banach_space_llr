@@ -26,7 +26,9 @@ ESTIMATORS = {'NWE': nadaraya_watson_estimator,
 def experiment(n_time: int,
                n_space: int,
                n_repetitions: int,
-               filepath: str = None) -> dict:
+               filepath: str = None,
+               estimators: dict = None,
+               single_est: Callable = None) -> dict:
     """
     Compare MAE and MSE of the three estimators (NWE, LLE, Jackknife) for mu and
     its derivative.
@@ -36,6 +38,10 @@ def experiment(n_time: int,
     :param n_repetitions: Number of simulated time series per model.
     :param filepath: Path to save the results. Defaults to None, in which case
         no results are saved.
+    :param estimators: Dictionary containing estimators to use. If None,
+        defaults to the global variable ESTIMATORS.
+    :param single_est: Function called for each estimator. Defaults to
+        single_estimator.
     :return: Results of experiments as nested dictionary, with levels:
         1. Mean: ['mu_1', 'mu_2']
         2. Errors: ['IID_BM','IID_BB', 'FAR_BM', 'FAR_BB',
@@ -44,6 +50,12 @@ def experiment(n_time: int,
         3. Estimator: ['NWE', 'LLE', 'Jackknife']
         4. Metrics: ['time', 'MAE', 'MSE']
     """
+    if estimators is None:
+        estimators = ESTIMATORS
+
+    if single_est is None:
+        single_est = single_estimator
+
     results = {}
     for mean_name, mean_func, mean_kwargs in CONFIG_MEAN:
         results[mean_name] = {}
@@ -54,8 +66,8 @@ def experiment(n_time: int,
             data = np.stack([mean + error_func(n_time, n_space, **error_kwargs)
                              for _ in range(n_repetitions)], axis=-1)
 
-            for estimator_name, estimator in ESTIMATORS.items():
-                res = single_estimator(data, estimator, estimator_name, mean)
+            for estimator_name, estimator in estimators.items():
+                res = single_est(data, estimator, estimator_name, mean)
                 results[mean_name][error_name][estimator_name] = res
 
                 if filepath is not None:
