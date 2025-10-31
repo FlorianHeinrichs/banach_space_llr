@@ -123,4 +123,4 @@ def bandwidth_cv(X: np.ndarray,
                              | np.isnan(best_mse))
         best_bw[better_bw], best_mse[better_bw] = bw, mse[better_bw]
 
-    return best_bw, mses if return_mses else best_bw
+    return (best_bw, mses) if return_mses else best_bw
