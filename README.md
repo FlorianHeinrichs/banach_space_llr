@@ -1,8 +1,8 @@
-# Local Linear Regression for Banach Space-Valued Time Series
+# Local Polynomial Regression for Banach Space-Valued Time Series
 
 This repository contains the code for the methods and experiments presented in the paper titled:
 
-Title: A Note on Local Linear Regression for Time Series in Banach Spaces
+Title: A Note on Local Polynomial Regression for Time Series in Banach Spaces
 
 Authors: Florian Heinrichs
 
